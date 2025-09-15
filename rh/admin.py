@@ -99,6 +99,18 @@ class DesligamentoAdmin(admin.ModelAdmin):
         }),
     )
 
+    def get_changelist_formset(self, request, **kwargs):
+        formset = super().get_changelist_formset(request, **kwargs)
+        if not (request.user.is_superuser or request.user.groups.filter(name="RH").exists()):
+            formset.form.base_fields["status"].disabled = True
+        return formset
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        if not (request.user.is_superuser or request.user.groups.filter(name="RH").exists()):
+            readonly.append("status")
+        return readonly
+
     def save_model(self, request, obj, form, change):
         is_new = obj.pk is None
         if is_new:
@@ -190,6 +202,18 @@ class AdmissaoAdmin(admin.ModelAdmin):
         }),
     )
 
+    def get_changelist_formset(self, request, **kwargs):
+        formset = super().get_changelist_formset(request, **kwargs)
+        if not (request.user.is_superuser or request.user.groups.filter(name="RH").exists()):
+            formset.form.base_fields["status"].disabled = True
+        return formset
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        if not (request.user.is_superuser or request.user.groups.filter(name="RH").exists()):
+            readonly.append("status")
+        return readonly
+
     def save_model(self, request, obj, form, change):
         is_new = obj.pk is None
         if is_new:
@@ -263,6 +287,18 @@ class DistratoAdmin(admin.ModelAdmin):
             "fields": ("status",)
         }),
     )
+
+    def get_changelist_formset(self, request, **kwargs):
+        formset = super().get_changelist_formset(request, **kwargs)
+        if not (request.user.is_superuser or request.user.groups.filter(name="RH").exists()):
+            formset.form.base_fields["status"].disabled = True
+        return formset
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        if not (request.user.is_superuser or request.user.groups.filter(name="RH").exists()):
+            readonly.append("status")
+        return readonly
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
