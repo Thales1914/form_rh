@@ -56,7 +56,7 @@ class Desligamento(models.Model):
     class Meta:
         verbose_name = "Desligamento"
         verbose_name_plural = "Desligamentos"
-        unique_together = ("codigo", "demissao")  # 🚨 Evita duplicados
+        unique_together = ("codigo", "demissao") 
 
     def __str__(self):
         return f"{self.nome} ({self.codigo})"
@@ -130,7 +130,7 @@ class Admissao(models.Model):
     class Meta:
         verbose_name = "Admissão"
         verbose_name_plural = "Admissões"
-        unique_together = ("codigo", "data_admissao")  # 🚨 Evita duplicados
+        unique_together = ("codigo", "data_admissao") 
 
     def __str__(self):
         return f"{self.nome} ({self.codigo})"
@@ -178,7 +178,7 @@ class Distrato(models.Model):
     class Meta:
         verbose_name = "Distrato"
         verbose_name_plural = "Distratos"
-        unique_together = ("cpf", "data_demissao")  # 🚨 Evita duplicados
+        unique_together = ("cpf", "data_demissao")  
 
     def __str__(self):
         return f"Distrato - {self.nome}"
