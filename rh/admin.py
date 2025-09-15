@@ -115,7 +115,6 @@ class DesligamentoAdmin(admin.ModelAdmin):
         is_new = obj.pk is None
         if is_new:
             obj.criado_por = request.user
-            # 🚨 Validação de duplicado
             if Desligamento.objects.filter(codigo=obj.codigo, demissao=obj.demissao).exists():
                 raise ValidationError("Já existe um desligamento registrado para este colaborador nessa data.")
         super().save_model(request, obj, form, change)
@@ -161,6 +160,13 @@ class DesligamentoAdmin(admin.ModelAdmin):
             raise PermissionDenied("Você não tem permissão para exportar este registro.")
         desligamento = Desligamento.objects.get(id=desligamento_id)
         return exportar_desligamento_excel(desligamento)
+
+    # 👇 Permissões
+    def has_view_permission(self, request, obj=None):
+        return True  # Todos podem visualizar
+
+    def has_module_permission(self, request):
+        return self.has_view_permission(request)
 
 
 # ==========================================================
@@ -221,7 +227,6 @@ class AdmissaoAdmin(admin.ModelAdmin):
         is_new = obj.pk is None
         if is_new:
             obj.criado_por = request.user
-            # 🚨 Validação de duplicado
             if Admissao.objects.filter(codigo=obj.codigo, data_admissao=obj.data_admissao).exists():
                 raise ValidationError("Já existe uma admissão registrada para este código nessa data.")
         super().save_model(request, obj, form, change)
@@ -261,6 +266,13 @@ class AdmissaoAdmin(admin.ModelAdmin):
             raise PermissionDenied("Você não tem permissão para exportar este registro.")
         admissao = Admissao.objects.get(id=admissao_id)
         return exportar_admissao_excel(admissao)
+
+    # 👇 Permissões
+    def has_view_permission(self, request, obj=None):
+        return True  # Todos podem visualizar
+
+    def has_module_permission(self, request):
+        return self.has_view_permission(request)
 
 
 # ==========================================================
@@ -309,7 +321,6 @@ class DistratoAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             obj.criado_por = request.user
-            # 🚨 Validação de duplicado
             if Distrato.objects.filter(cpf=obj.cpf, data_demissao=obj.data_demissao).exists():
                 raise ValidationError("Já existe um distrato registrado para este CPF nessa data.")
         super().save_model(request, obj, form, change)
@@ -347,6 +358,13 @@ class DistratoAdmin(admin.ModelAdmin):
         distrato = Distrato.objects.get(id=distrato_id)
         return exportar_distrato_excel(distrato)
 
+    # 👇 Permissões
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser or request.user.groups.filter(name="RH").exists()
+
+    def has_module_permission(self, request):
+        return self.has_view_permission(request)
+
 
 # ==========================================================
 #               HIERARQUIA
@@ -367,3 +385,6 @@ class HierarquiaAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser or request.user.groups.filter(name="RH").exists()
+
+    def has_module_permission(self, request):
+        return self.has_view_permission(request)
