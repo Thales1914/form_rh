@@ -56,6 +56,7 @@ class Desligamento(models.Model):
     class Meta:
         verbose_name = "Desligamento"
         verbose_name_plural = "Desligamentos"
+        unique_together = ("codigo", "demissao")  # 🚨 Evita duplicados
 
     def __str__(self):
         return f"{self.nome} ({self.codigo})"
@@ -86,7 +87,7 @@ class Admissao(models.Model):
     rg = models.CharField("RG", max_length=20, blank=True, null=True)
     orgao_exp = models.CharField("Órgão Expedidor", max_length=20, blank=True, null=True)
     emissao = models.DateField("Data de Emissão RG", null=True, blank=True)
-    cpf = models.CharField("CPF", max_length=14, blank=True, null=True, unique=True, db_index=True) 
+    cpf = models.CharField("CPF", max_length=14, blank=True, null=True, unique=True, db_index=True)
 
     banco = models.CharField("Banco", max_length=100, blank=True, null=True)
     agencia = models.CharField("Agência", max_length=20, blank=True, null=True)
@@ -129,6 +130,7 @@ class Admissao(models.Model):
     class Meta:
         verbose_name = "Admissão"
         verbose_name_plural = "Admissões"
+        unique_together = ("codigo", "data_admissao")  # 🚨 Evita duplicados
 
     def __str__(self):
         return f"{self.nome} ({self.codigo})"
@@ -176,6 +178,7 @@ class Distrato(models.Model):
     class Meta:
         verbose_name = "Distrato"
         verbose_name_plural = "Distratos"
+        unique_together = ("cpf", "data_demissao")  # 🚨 Evita duplicados
 
     def __str__(self):
         return f"Distrato - {self.nome}"

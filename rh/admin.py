@@ -115,6 +115,9 @@ class DesligamentoAdmin(admin.ModelAdmin):
         is_new = obj.pk is None
         if is_new:
             obj.criado_por = request.user
+            # 🚨 Validação de duplicado
+            if Desligamento.objects.filter(codigo=obj.codigo, demissao=obj.demissao).exists():
+                raise ValidationError("Já existe um desligamento registrado para este colaborador nessa data.")
         super().save_model(request, obj, form, change)
 
         if is_new:
@@ -218,6 +221,9 @@ class AdmissaoAdmin(admin.ModelAdmin):
         is_new = obj.pk is None
         if is_new:
             obj.criado_por = request.user
+            # 🚨 Validação de duplicado
+            if Admissao.objects.filter(codigo=obj.codigo, data_admissao=obj.data_admissao).exists():
+                raise ValidationError("Já existe uma admissão registrada para este código nessa data.")
         super().save_model(request, obj, form, change)
 
         if is_new:
@@ -303,6 +309,9 @@ class DistratoAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             obj.criado_por = request.user
+            # 🚨 Validação de duplicado
+            if Distrato.objects.filter(cpf=obj.cpf, data_demissao=obj.data_demissao).exists():
+                raise ValidationError("Já existe um distrato registrado para este CPF nessa data.")
         super().save_model(request, obj, form, change)
 
     def get_queryset(self, request):
