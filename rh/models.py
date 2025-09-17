@@ -103,11 +103,10 @@ class Admissao(models.Model):
 
     conta_gov = models.CharField("Conta Gov", max_length=100, blank=True, null=True)
     senha_gov = models.CharField(
-        "Senha Gov (NÃO armazenar em produção)",
+        "Senha Gov",
         max_length=100,
         blank=True,
         null=True,
-        help_text="⚠️ Não recomendado salvar senha em texto puro"
     )
 
     observacoes = models.TextField("Observações", blank=True, null=True)
