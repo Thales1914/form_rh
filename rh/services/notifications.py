@@ -1,51 +1,71 @@
+import logging
 from django.core.mail import send_mail
 from django.conf import settings
-import logging
 
 logger = logging.getLogger(__name__)
 
-DESTINATARIOS = settings.EMAIL_DESTINATARIOS or [
-    "rh@omegadistribuidora.com.br",
-]
-
-def _enviar_email(**kwargs):
-    try:
-        send_mail(**kwargs)
-        logger.info(f"E-mail enviado com sucesso: {kwargs.get('subject')}")
-    except Exception as e:
-        logger.error(f"Erro ao enviar e-mail: {e}")
 
 def notificar_admissao(obj, usuario):
+    """
+    Envia e-mail notificando nova admissão pelo SendGrid.
+    """
     assunto = "📥 Nova admissão registrada"
-    mensagem = (
+    corpo = (
+        f"Uma nova admissão foi registrada:\n\n"
         f"Nome: {obj.nome}\n"
-        f"Código RCA: {obj.codigo}\n"
-        f"Data de Admissão: {obj.data_admissao.strftime('%d/%m/%Y') if obj.data_admissao else '-'}\n"
-        f"Cargo: {obj.cargo or '-'}\n"
-        f"Supervisor Responsável: {obj.supervisor_responsavel or '-'}\n"
+        f"Código RCA: {getattr(obj, 'codigo', '-')}\n"
+        f"Data de Admissão: "
+        f"{obj.data_admissao.strftime('%d/%m/%Y') if getattr(obj, 'data_admissao', None) else '-'}\n"
+        f"Cargo: {getattr(obj, 'cargo', '-')}\n"
+        f"Supervisor Responsável: {getattr(obj, 'supervisor_responsavel', '-')}\n"
         f"Registrado por: {usuario.get_username()}"
-    )
-    _enviar_email(
-        subject=assunto,
-        message=mensagem,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=DESTINATARIOS,
-        fail_silently=False,
     )
 
+    try:
+        enviados = send_mail(
+            subject=assunto,
+            message=corpo,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=settings.EMAIL_DESTINATARIOS,
+            fail_silently=False,
+        )
+        if enviados > 0:
+            logger.info("E-mail de admissão enviado com sucesso para %s", settings.EMAIL_DESTINATARIOS)
+        else:
+            logger.warning("Nenhum e-mail de admissão foi enviado.")
+    except Exception as e:
+        logger.error("Erro ao enviar e-mail de admissão: %s", e, exc_info=True)
+        raise
+
+
 def notificar_desligamento(obj, usuario):
+    """
+    Envia e-mail notificando novo desligamento pelo SendGrid.
+    """
     assunto = "📤 Novo desligamento registrado"
-    mensagem = (
+    corpo = (
+        f"Uma nova saída foi registrada:\n\n"
         f"Nome: {obj.nome}\n"
-        f"Código: {obj.codigo}\n"
-        f"Área: {obj.area_atuacao or '-'}\n"
-        f"Data de Demissão: {obj.demissao.strftime('%d/%m/%Y') if obj.demissao else '-'}\n"
+        f"Código RCA: {getattr(obj, 'codigo', '-')}\n"
+        f"Data de Desligamento: "
+        f"{obj.data_desligamento.strftime('%d/%m/%Y') if getattr(obj, 'data_desligamento', None) else '-'}\n"
+        f"Cargo: {getattr(obj, 'cargo', '-')}\n"
+        f"Supervisor Responsável: {getattr(obj, 'supervisor_responsavel', '-')}\n"
         f"Registrado por: {usuario.get_username()}"
     )
-    _enviar_email(
-        subject=assunto,
-        message=mensagem,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=DESTINATARIOS,
-        fail_silently=False,
-    )
+
+    try:
+        enviados = send_mail(
+            subject=assunto,
+            message=corpo,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=settings.EMAIL_DESTINATARIOS,
+            fail_silently=False,
+        )
+        if enviados > 0:
+            logger.info("E-mail de desligamento enviado com sucesso para %s", settings.EMAIL_DESTINATARIOS)
+        else:
+            logger.warning("Nenhum e-mail de desligamento foi enviado.")
+    except Exception as e:
+        logger.error("Erro ao enviar e-mail de desligamento: %s", e, exc_info=True)
+        raise
